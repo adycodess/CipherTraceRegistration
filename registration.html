@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CipherTrace | Event Registration</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      color: #e0e0e0;
+    }
+
+    /* Background Video */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    /* Dark Overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.65),
+        rgba(0,0,0,0.85)
+      );
+      z-index: -1;
+    }
+
+    /* Subtle Grid Effect */
+    .overlay::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+    }
+
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: rgba(10, 14, 18, 0.85);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      padding: 36px;
+      box-shadow:
+        0 0 25px rgba(0,255,255,0.15),
+        inset 0 0 25px rgba(0,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.25);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 3px;
+      color: #00ffff;
+      text-shadow: 0 0 12px rgba(0,255,255,0.6);
+    }
+
+    p {
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 28px;
+      color: #9fb0c3;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      color: #b8d9e6;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 1px solid #1e3f44;
+      background: rgba(5,10,14,0.9);
+      color: #e0f7fa;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    input::placeholder {
+      color: #6b8591;
+    }
+
+    input:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #00ffff, #0066ff);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      color: #000;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(0,255,255,0.7);
+    }
+
+    .status {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      min-height: 16px;
+    }
+
+    .success { color: #00ff9d; }
+    .error { color: #ff6b6b; }
+  </style>
+</head>
+<body>
+
+  <!-- Background Video -->
+  <video class="video-bg" autoplay muted loop playsinline>
+    <source src="video.mp4" type="video/mp4">
+  </video>
+
+  <div class="overlay"></div>
+
+  <div class="wrapper">
+    <div class="container">
+      <h1>CipherTrace</h1>
+      <p>Secure Event Registration Portal</p>
+
+      <form id="registrationForm">
+        <label for="name">FULL NAME</label>
+        <input type="text" id="name" required />
+
+        <label for="roll">ROLL NUMBER</label>
+        <input type="text" id="roll" required />
+
+        <label for="email">INSTITUTE EMAIL ID</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="yourid@ds.study.iitm.ac.in"
+          required
+        />
+
+        <button type="submit">REGISTER</button>
+      </form>
+
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+</body>
+</html>
+
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMr7PpRjCY3k0hRTELcrSLi0CXllh9AE4",
+      authDomain: "ciphertrace-9738c.firebaseapp.com",
+      databaseURL: "https://ciphertrace-9738c-default-rtdb.firebaseio.com",
+      projectId: "ciphertrace-9738c",
+      storageBucket: "ciphertrace-9738c.firebasestorage.app",
+      messagingSenderId: "786054972596",
+      appId: "1:786054972596:web:60426cc72e8722092243e1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    const form = document.getElementById("registrationForm");
+    const statusDiv = document.getElementById("status");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const roll = document.getElementById("roll").value.trim();
+      const emailRaw = document.getElementById("email").value;
+
+      const email = emailRaw
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+
+      if (!email.endsWith("@ds.study.iitm.ac.in")) {
+        statusDiv.textContent = "Only @ds.study.iitm.ac.in emails are allowed.";
+        statusDiv.className = "status error";
+        return;
+      }
+
+      push(ref(database, "CipherTraceRegistrations"), {
+        name: name,
+        roll: roll,
+        email: email,
+        timestamp: new Date().toISOString()
+      })
+      .then(() => {
+        statusDiv.textContent = "Registration successful. Data saved.";
+        statusDiv.className = "status success";
+        form.reset();
+      })
+      .catch((error) => {
+        statusDiv.textContent = "Registration failed. Check console.";
+        statusDiv.className = "status error";
+        console.error(error);
+      });
+    });
+  </script>
+
+</body>
+</html>
